@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <canvas height="600" width="600"></canvas>
+</body>
+</html>
+<script>
+  // 将数据存放在数组中
+  var arr = [22,18,31,17,123];
+  // 获取并创建画布
+  var canvas = document.querySelector('canvas');
+  var ctx = canvas.getContext('2d');
+  // 获取画布的宽高
+  var width = ctx.canvas.width;
+  var height = ctx.canvas.height;
+  // 设置饼状图圆心位置
+  var pointX = width/2;
+  var pointY = height/2;
+  // 设置饼状图半径
+  var r = 100;
+  // 数据总和
+  var sum = arr.reduce((a,b) => a+b)
+  // 开始弧度
+  var startArc = 0;
+  arr.forEach(v => {
+    // 每个数据的结束弧度
+    var endArc = startArc + v/sum *360 *Math.PI / 180;
+    ctx.beginPath();
+    ctx.moveTo(pointX,pointY);
+    ctx.fillStyle = getColor();
+    ctx.arc(pointX,pointY,r,startArc,endArc)
+    ctx.stroke();
+    ctx.fill();
+    // 将此次数据的结束弧度赋给下一个数据的开始弧度
+    startArc = endArc;
+  })
+  function getColor(){
+    var r = Math.floor(Math.random()*256);
+    var g = Math.floor(Math.random()*256);
+    var b= Math.floor(Math.random()*256);
+    return `rgb(${r},${g},${b})`
+  }
+</script>

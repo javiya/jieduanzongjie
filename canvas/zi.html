@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Document</title>
+</head>
+<body>
+  <canvas height="900" width="900"></canvas>
+</body>
+</html>
+<script>
+  // 获取并创建画布
+  var canvas = document.querySelector('canvas');
+  var ctx = canvas.getContext('2d');
+  // 定义圆心、半径
+  var x = ctx.canvas.width / 2 + 200;
+  var y = ctx.canvas.height / 2;
+  var r = 150;
+  var R = r + 40;
+  // 将文本数据存放在数组中
+  var data = [
+    {
+        title:"15 ~ 20 岁",
+        num:20
+    },
+    {
+        title:"20 ~ 25 岁",
+        num:15
+    },
+    {
+        title:"25 ~ 30 岁",
+        num:10
+    },
+    {
+        title:"30 ~ 35 岁",
+        num:35
+    },
+    {
+        title:"35 ~ 40 岁",
+        num:12
+    },
+    {
+        title:"40 ~ 45 岁",
+        num:25
+    },
+    {
+        title:"45 ~ 50 岁",
+        num:30
+    },
+    {
+        title:"50 ~ 55 岁",
+        num:35
+    },
+    {
+        title:"55 ~ 60 岁",
+        num:50
+    }
+];
+// 处理数据
+var startNum = data[0].num
+var total = data.reduce((a,b)=>{
+    if(typeof a === 'number'){
+        return a + b.num
+    }else{
+        return startNum + b.num
+    }
+    
+})
+data.forEach(v=>{
+    // 给每个对象添加弧度
+    // v.arc = v.num/total*360 * Math.PI / 180
+    v.arc = v.num/total*2 * Math.PI
+})
+// 画饼
+var startArc = 0
+data.forEach((v,index)=>{
+    ctx.beginPath()
+    ctx.moveTo(x,y)
+    var endArc = startArc + v.arc
+    ctx.arc(x,y,r,startArc,endArc)
+    startArc = endArc
+    var color = getColor()
+    ctx.fillStyle = color
+    ctx.fill()
+    // 画延伸线
+    outLine(v.arc,endArc,color,v.title)
+    // 画说明方块
+    descSquare(index)
+})
+// 画说明方块
+function descSquare(index){
+    var squareWidth = 50;
+    var squareHeight = 30;
+    var squareLeft = 20;
+    var squareTop = 20
+    // 画小方块
+    ctx.fillRect(squareLeft,squareTop*(index+1)+squareHeight*index,squareWidth,squareHeight)
+
+    // 计算文字的开始坐标
+    var textX = squareLeft + squareWidth + squareLeft
+    var textY = squareTop*(index+1)+squareHeight*index+squareHeight/2
+
+    ctx.textBaseline = 'middle';
+    ctx.textAlign = 'left';
+    var percent = (data[index].num / total).toFixed(2) * 100 + '%'
+    ctx.fillText(data[index].title+'   ' + percent,textX,textY)
+
+}
+// 画延伸线
+function outLine(currentArc,endArc,color,title){
+    // 获取到需要画线的这个弧度
+    var arc = endArc - currentArc/2
+    // 计算这条线的终点x和y
+    var endX = Math.cos(arc) * R + x
+    var endY = Math.sin(arc) * R + y
+    ctx.moveTo(x,y)
+    ctx.lineTo(endX,endY)
+    ctx.strokeStyle = color
+    // 获取文字长度
+    ctx.font = '16px STSONG'
+    var textWidth = ctx.measureText(title).width
+    if(endX<x){
+        textX = endX - textWidth
+        ctx.textAlign = 'left';
+    }else{
+        textX = endX + textWidth
+        ctx.textAlign = 'right';
+    }
+    ctx.textBaseline = 'bottom';
+    ctx.lineTo(textX,endY)
+    // 写字
+    ctx.strokeText(title,textX,endY-3)
+    ctx.stroke()
+}
+
+// 随机颜色
+function getColor(){
+    return `rgb(${Math.floor(Math.random()*256)},${Math.floor(Math.random()*256)},${Math.floor(Math.random()*256)})`
+}
+</script>
